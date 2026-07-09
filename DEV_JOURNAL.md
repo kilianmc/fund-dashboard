@@ -182,7 +182,7 @@ Bottom Right — Allocation Donut
 Animated donut (72% cutout, rounded segments, hover offset) with €425,800 / Total Portfolio centered, plus a clean legend with matching colors and € values.
 Colors are consistent across table, donut, and legend (EuroStocks = blue, S&P 500 = emerald, EM = violet), and it's responsive — under ~1080px the grid stacks to one column.
 
-![Fund portfolio dashboard mockup](../../image.png)
+![Fund portfolio dashboard mockup](src/data/image.png)
 
 ---
 
