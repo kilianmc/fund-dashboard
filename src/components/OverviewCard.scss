@@ -1,0 +1,47 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+// KPI grid
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kpi {
+  @include inset-panel;
+  padding: 14px 16px;
+
+  .label {
+    @include uppercase-label;
+  }
+  .value {
+    font-size: 21px;
+    font-weight: 700;
+    margin-top: 6px;
+
+    &.sm {
+      font-size: 17px;
+    }
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-top: 4px;
+
+  &.up {
+    color: $green;
+  }
+  &.down {
+    color: $red;
+  }
+}

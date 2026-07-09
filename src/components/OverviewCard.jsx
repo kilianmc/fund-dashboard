@@ -1,4 +1,5 @@
 import { fmtEur, TOTAL_VALUE, YTD_RETURN } from '../data/portfolio';
+import './OverviewCard.scss';
 
 export default function OverviewCard() {
   return (

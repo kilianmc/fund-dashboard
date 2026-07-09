@@ -1,16 +1,21 @@
 import { Doughnut } from 'react-chartjs-2';
 import { funds, fmtEur, TOTAL_VALUE } from '../data/portfolio';
+import { useTheme } from '../theme/ThemeContext';
+import './AllocationCard.scss';
 
-const data = {
-  labels: funds.map((f) => f.name),
-  datasets: [
-    {
-      data: funds.map((f) => f.alloc),
-      backgroundColor: funds.map((f) => f.color),
-      borderColor: '#fff', borderWidth: 4, hoverOffset: 8, borderRadius: 6, spacing: 2,
-    },
-  ],
-};
+function makeData(theme) {
+  return {
+    labels: funds.map((f) => f.name),
+    datasets: [
+      {
+        data: funds.map((f) => f.alloc),
+        backgroundColor: funds.map((f) => f.color),
+        borderColor: theme === 'dark' ? '#161b26' : '#fff',
+        borderWidth: 4, hoverOffset: 8, borderRadius: 6, spacing: 2,
+      },
+    ],
+  };
+}
 
 const options = {
   responsive: true,
@@ -27,6 +32,7 @@ const options = {
 };
 
 export default function AllocationCard() {
+  const { theme } = useTheme();
   return (
     <section className="card">
       <div className="card-head">
@@ -37,7 +43,7 @@ export default function AllocationCard() {
       </div>
       <div className="donut-layout">
         <div className="donut-wrap">
-          <Doughnut data={data} options={options} />
+          <Doughnut data={makeData(theme)} options={options} />
           <div className="donut-center">
             <div className="dc-val">{fmtEur(TOTAL_VALUE)}</div>
             <div className="dc-lab">Total Portfolio</div>

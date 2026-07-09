@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { perfData, perfRanges } from '../data/portfolio';
+import { useTheme } from '../theme/ThemeContext';
+import './PerformanceCard.scss';
 
 // Scriptable gradient — recomputed once the chart area is known.
 function portGradient(context) {
@@ -31,33 +33,37 @@ function makeData(key) {
   };
 }
 
-const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  interaction: { mode: 'index', intersect: false },
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      backgroundColor: '#0d1b2a', padding: 12, cornerRadius: 10, displayColors: true,
-      titleFont: { family: 'Inter', size: 12, weight: '600' }, titleColor: '#93a1af',
-      bodyFont: { family: 'Inter', size: 13, weight: '600' }, bodyColor: '#fff', boxPadding: 5,
-      callbacks: { label: (c) => '  ' + c.dataset.label + ':  ' + c.parsed.y.toFixed(1) },
+function makeOptions(theme) {
+  const gridColor = theme === 'dark' ? '#232a37' : '#eef1f5';
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0d1b2a', padding: 12, cornerRadius: 10, displayColors: true,
+        titleFont: { family: 'Inter', size: 12, weight: '600' }, titleColor: '#93a1af',
+        bodyFont: { family: 'Inter', size: 13, weight: '600' }, bodyColor: '#fff', boxPadding: 5,
+        callbacks: { label: (c) => '  ' + c.dataset.label + ':  ' + c.parsed.y.toFixed(1) },
+      },
     },
-  },
-  scales: {
-    x: {
-      grid: { display: false }, border: { display: false },
-      ticks: { color: '#93a1af', font: { family: 'Inter', size: 11.5, weight: '500' } },
+    scales: {
+      x: {
+        grid: { display: false }, border: { display: false },
+        ticks: { color: '#93a1af', font: { family: 'Inter', size: 11.5, weight: '500' } },
+      },
+      y: {
+        grid: { color: gridColor }, border: { display: false },
+        ticks: { color: '#93a1af', font: { family: 'Inter', size: 11.5, weight: '500' }, callback: (v) => v },
+      },
     },
-    y: {
-      grid: { color: '#eef1f5' }, border: { display: false },
-      ticks: { color: '#93a1af', font: { family: 'Inter', size: 11.5, weight: '500' }, callback: (v) => v },
-    },
-  },
-};
+  };
+}
 
 export default function PerformanceCard() {
   const [range, setRange] = useState('12m');
+  const { theme } = useTheme();
   return (
     <section className="card">
       <div className="card-head">
@@ -82,7 +88,7 @@ export default function PerformanceCard() {
         <div className="legend-item"><span className="swatch dashed"></span> S&amp;P 500 Benchmark</div>
       </div>
       <div className="chart-wrap">
-        <Line data={makeData(range)} options={options} />
+        <Line data={makeData(range)} options={makeOptions(theme)} />
       </div>
     </section>
   );

@@ -1,0 +1,128 @@
+@use 'styles/variables' as *;
+@use 'styles/mixins' as *;
+
+// ===== Theme tokens =====
+:root {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --ink: #0d1b2a;
+  --ink-2: #5a6b7b;
+  --ink-3: #93a1af;
+  --line: #eef1f5;
+  --blue: #2563eb;
+  --green: #12a150;
+  --green-soft: #e3f6ec;
+  --red: #e5484d;
+  --panel: #fbfcfe;
+  --seg-bg: #f1f4f8;
+  --seg-active-bg: #ffffff;
+  --track: #eef1f5;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06);
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+[data-theme='dark'] {
+  --bg: #0d1017;
+  --card: #161b26;
+  --ink: #e6edf6;
+  --ink-2: #9aa7b8;
+  --ink-3: #6b7889;
+  --line: #232a37;
+  --blue: #4f83ff;
+  --green: #34d17e;
+  --green-soft: #14311f;
+  --red: #ff6b6f;
+  --panel: #1b2230;
+  --seg-bg: #1b2230;
+  --seg-active-bg: #2b3444;
+  --track: #232a37;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  background: $bg;
+  color: $ink;
+  font-family: $font-sans;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+.app {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 28px 32px 40px;
+
+  @include tablet {
+    padding: 24px 24px 32px;
+  }
+  @include mobile {
+    padding: 16px 14px 28px;
+  }
+}
+
+// Grid
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+
+  @include mobile {
+    gap: 16px;
+  }
+}
+
+.card {
+  background: $card;
+  border: 1px solid $line;
+  border-radius: $radius;
+  box-shadow: $shadow;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  // two equal panels per row; min-width:0 lets them shrink below content width
+  flex: 1 1 calc(50% - 11px);
+  min-width: 0;
+  max-width: 100%;
+  transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+
+  @include desktop {
+    flex-basis: calc(50% - 11px);
+  }
+  @include tablet {
+    flex-basis: 100%;
+  }
+  @include mobile {
+    flex-basis: 100%;
+    padding: 18px;
+  }
+}
+
+.card-head {
+  @include flex(flex-start, space-between);
+  margin-bottom: 18px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+
+  @include mobile {
+    font-size: 15px;
+  }
+}
+
+.card-sub {
+  font-size: 12.5px;
+  color: $ink-3;
+  font-weight: 500;
+  margin-top: 3px;
+}

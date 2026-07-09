@@ -1,0 +1,127 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+// Holdings table
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  @include uppercase-label;
+  text-align: right;
+  padding: 0 0 12px;
+  border-bottom: 1px solid $line;
+
+  &:first-child {
+    text-align: left;
+  }
+}
+
+tbody td {
+  padding: 15px 0;
+  border-bottom: 1px solid $line;
+  text-align: right;
+  font-size: 14px;
+  font-weight: 600;
+
+  &:first-child {
+    text-align: left;
+  }
+}
+
+.fund-cell {
+  @include flex(center, flex-start, 11px);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex: none;
+}
+
+.fund-name {
+  font-weight: 600;
+}
+
+.fund-tag {
+  font-size: 11.5px;
+  color: $ink-3;
+  font-weight: 500;
+}
+
+.fund-name,
+.fund-tag {
+  white-space: nowrap;
+}
+
+.alloc-bar {
+  @include flex(center, flex-end, 10px);
+}
+
+.alloc-track {
+  width: 54px;
+  height: 6px;
+  background: $track;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.alloc-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+
+.pos {
+  color: $green;
+}
+.neg {
+  color: $red;
+}
+
+// Scrollable holdings table with pinned header
+.table-scroll {
+  max-height: 340px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+
+  table {
+    min-width: 440px;
+  }
+  thead th {
+    position: sticky;
+    top: 0;
+    background: $card;
+    z-index: 1;
+  }
+}
+
+tfoot td {
+  padding-top: 16px;
+  font-size: 14px;
+}
+
+.foot-strip {
+  @include flex(center, space-between);
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid $line;
+}
+
+.foot-block {
+  .fl {
+    font-size: 12px;
+    color: $ink-3;
+    font-weight: 600;
+  }
+  .fv {
+    font-size: 20px;
+    font-weight: 800;
+    margin-top: 3px;
+
+    &.green {
+      color: $green;
+    }
+  }
+}

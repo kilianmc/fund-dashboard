@@ -1,0 +1,48 @@
+@use 'variables' as *;
+
+// ===== Layout helpers =====
+@mixin flex($align: center, $justify: flex-start, $gap: 0) {
+  display: flex;
+  align-items: $align;
+  justify-content: $justify;
+  @if $gap != 0 {
+    gap: $gap;
+  }
+}
+
+// ===== Responsive breakpoints =====
+@mixin mobile {
+  @media (max-width: $bp-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $bp-tablet-min) and (max-width: $bp-tablet-max) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $bp-desktop) {
+    @content;
+  }
+}
+
+// ===== Typography =====
+// Small uppercase label used for KPI labels and table headers.
+@mixin uppercase-label($color: $ink-3) {
+  font-size: 11.5px;
+  color: $color;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+// ===== Components =====
+// Soft inset panel (KPI tiles etc.)
+@mixin inset-panel {
+  background: $panel;
+  border: 1px solid $line;
+  border-radius: $radius-sm;
+}

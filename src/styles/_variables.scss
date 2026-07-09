@@ -1,0 +1,34 @@
+// ===== Static tokens (theme-independent) =====
+// Radii
+$radius: 16px;
+$radius-sm: 12px;
+
+// Breakpoints
+$bp-mobile: 640px;
+$bp-tablet-min: 641px;
+$bp-tablet-max: 1024px;
+$bp-desktop: 1025px;
+
+// Font
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+// ===== Themed tokens =====
+// These resolve at runtime through CSS custom properties so the whole UI can
+// switch between light and dark. The literal values per theme live in the
+// :root / [data-theme='dark'] blocks in index.scss.
+$bg: var(--bg);
+$card: var(--card);
+$ink: var(--ink);
+$ink-2: var(--ink-2);
+$ink-3: var(--ink-3);
+$line: var(--line);
+$blue: var(--blue);
+$green: var(--green);
+$green-soft: var(--green-soft);
+$red: var(--red);
+$panel: var(--panel); // soft inset tiles (KPIs)
+$seg-bg: var(--seg-bg); // segmented control track
+$seg-active-bg: var(--seg-active-bg); // active segment
+$track: var(--track); // allocation bar track
+$shadow: var(--shadow);
+$shadow-sm: var(--shadow-sm);

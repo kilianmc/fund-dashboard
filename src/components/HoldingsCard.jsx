@@ -1,4 +1,5 @@
 import { funds, fmtEur, fmtSigned, signClass, TOTAL_VALUE, YTD_RETURN } from '../data/portfolio';
+import './HoldingsCard.scss';
 
 export default function HoldingsCard() {
   return (
