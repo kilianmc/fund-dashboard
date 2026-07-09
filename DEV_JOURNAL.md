@@ -314,6 +314,7 @@ src/
     ├── HoldingsCard.jsx / .scss
     └── AllocationCard.jsx / .scss
 ```
+![Fund portfolio v3](src/data/v3.png)
 
 ### Task 4
 
