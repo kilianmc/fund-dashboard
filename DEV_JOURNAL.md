@@ -325,3 +325,68 @@ The Sass legacy-js-api warning flood is gone (Vite 8 now honors api: 'modern-com
 ### Task 5
 
 switch hover of darkmode button to show border instead of moving it.
+
+## Session — 2026-07-10
+
+Iterated on the dashboard's data density and readability — scroll affordances,
+an equity/income asset mix, richer KPIs, and a cleaner holdings/allocation layout.
+
+### Task 1 — Scroll hint on the Holdings table
+Goal: signal that rows are hidden below the fold and the table scrolls.
+- Wrapped `.table-scroll` in a positioned `.table-wrap` (`HoldingsCard.jsx`).
+- Added a `::after` bottom fade gradient (`transparent → $card`, `pointer-events: none`)
+  so the last visible rows fade into the card — CSS-only, no JS scroll listener.
+
+### Task 2 — Allocation legend: more space + matching fade
+Goal: give the donut legend more room and the same scroll cue as Holdings.
+- Raised legend `max-height` 240 → 300px so ~6–7 of the 10 funds show before scrolling.
+- Wrapped `.donut-legend` in `.legend-wrap` with the same `::after` fade.
+- **Bug fix:** initial `align-self: stretch` made the wrapper taller than the legend
+  (the layout fills the card height), pushing `bottom: 0` into empty space so the fade
+  was invisible. Removed it — the wrapper now hugs the legend and the fade lands correctly.
+
+### Task 3 — Equity vs. income asset mix
+Goal: show what share of the portfolio is equity vs. income.
+- Added a `type: 'equity' | 'income'` field to every fund in `data/portfolio.js`, plus
+  derived `EQUITY_PCT` / `INCOME_PCT` (summed from allocations).
+- Built a labeled stacked split bar (blue = equity, green = income).
+- First placed it under the Overview KPIs, then **moved it to the bottom of the
+  Allocation card** (with a `border-top` divider) at the card's request.
+
+### Task 4 — Yearly return on the Total Portfolio Value KPI
+Goal: mirror Today's Return (value + chip) on the total-value tile.
+- Added `YTD_RETURN_PCT` (14.8), rebuilt `YTD_RETURN` from it, and derived `YTD_GAIN`
+  (euro gain implied by growing the value from its start-of-year base).
+- Rendered a green chip: `▲ +€54,894 · +14.8% YTD`.
+
+### Task 5 — Type column in the Holdings table
+- Added a **Type** column (2nd) with a rounded pill badge — "Equity" (blue dot) /
+  "Income" (green dot), matching the asset-mix colors.
+- Widened table `min-width` 440 → 520px for the extra column.
+
+### Task 6 — Type indicator in the donut legend
+- Added a small square marker per legend row (blue = equity, green = income), **no text**,
+  with a `title` tooltip for accessibility.
+
+### Task 7 — Percentages on donut segments
+- Wrote an inline Chart.js plugin `arcLabels` that draws each fund's allocation % centered
+  on its arc (via `arc.getCenterPoint()`) — no new dependency; registered via the `plugins` prop.
+- Removed the `%` from the hover tooltip (now shows just the fund name).
+- Labels on slices `< 5%` are hidden to avoid crowding the thin arcs.
+
+### Task 8 — Removed allocation bars from Holdings
+- Dropped the `.alloc-track` / `.alloc-fill` micro-bar; the Allocation column now shows the
+  plain `%` value. Deleted the now-unused `.alloc-bar/.alloc-track/.alloc-fill` styles.
+- Centered the **Type** and **Allocation** columns (header + cells).
+
+### Task 9 — Overview KPI refresh
+- Removed the standalone **YTD Return** KPI (the figure still lives in the total-value chip).
+- Added three new KPIs to refill the 2×3 grid:
+  - **Best Performer (YTD)** — top fund by `ytd` (`BEST_PERFORMER`), with a green chip.
+  - **vs. Benchmark (12M)** — portfolio outperformance in points, from `perfData['12m']`.
+  - **Est. Annual Income** — `Σ value × yield` across **all** funds (`EST_ANNUAL_INCOME`).
+
+### Task 10 — Dividend yield data
+- Added a `yield` field to each fund to back the income projection.
+- Set equity yields to the 6–9% range (income funds left at ~2.7–3.6%), lifting
+  Est. Annual Income to ≈ €26,700.

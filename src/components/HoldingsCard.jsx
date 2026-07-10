@@ -10,11 +10,12 @@ export default function HoldingsCard() {
           <div className="card-sub">{funds.length} funds · Vanguard</div>
         </div>
       </div>
+      <div className="table-wrap">
       <div className="table-scroll">
         <table>
           <thead>
             <tr>
-              <th>Fund</th><th>Allocation</th><th>Market Value</th><th>Daily</th><th>YTD</th>
+              <th>Fund</th><th>Type</th><th>Allocation</th><th>Value</th><th>Daily</th><th>YTD</th>
             </tr>
           </thead>
           <tbody>
@@ -30,13 +31,9 @@ export default function HoldingsCard() {
                   </div>
                 </td>
                 <td>
-                  <div className="alloc-bar">
-                    {f.alloc}%
-                    <div className="alloc-track">
-                      <div className="alloc-fill" style={{ width: `${f.alloc}%`, background: f.color }}></div>
-                    </div>
-                  </div>
+                  <span className={`type-badge ${f.type}`}>{f.type === 'income' ? 'Income' : 'Equity'}</span>
                 </td>
+                <td>{f.alloc}%</td>
                 <td>{fmtEur(f.value)}</td>
                 <td className={signClass(f.daily)}>{fmtSigned(f.daily, 2)}</td>
                 <td className={signClass(f.ytd)}>{fmtSigned(f.ytd, 1)}</td>
@@ -44,6 +41,7 @@ export default function HoldingsCard() {
             ))}
           </tbody>
         </table>
+      </div>
       </div>
       <div className="foot-strip">
         <div className="foot-block">

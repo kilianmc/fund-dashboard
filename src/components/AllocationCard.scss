@@ -53,20 +53,34 @@
   }
 }
 
+.legend-wrap {
+  position: relative;
+  flex: 1;
+
+  // Bottom fade hinting at more legend items below the fold
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 40px;
+    background: linear-gradient(transparent, $card);
+    pointer-events: none;
+  }
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
 .donut-legend {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  flex: 1;
-  max-height: 240px;
+  max-height: 300px;
   overflow-y: auto;
-
-  @include tablet {
-    width: auto;
-  }
-  @include mobile {
-    width: 100%;
-  }
+  padding-bottom: 6px;
 }
 
 .dl-item {
@@ -96,7 +110,77 @@
   margin-top: 1px;
 }
 
+.dl-type {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  flex: none;
+
+  &.equity {
+    background: $blue;
+  }
+  &.income {
+    background: $green;
+  }
+}
+
 .dl-pct {
   font-size: 15px;
   font-weight: 700;
+}
+
+// Equity vs income asset mix
+.asset-split {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid $line;
+}
+
+.split-head {
+  @include flex(center, space-between);
+  margin-bottom: 8px;
+
+  .label {
+    @include uppercase-label;
+  }
+}
+
+.split-legend {
+  @include flex(center, flex-end, 14px);
+}
+
+.sl-item {
+  @include flex(center, flex-start, 6px);
+  font-size: 12.5px;
+  font-weight: 600;
+
+  &::before {
+    content: '';
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+  }
+  &.equity::before {
+    background: $blue;
+  }
+  &.income::before {
+    background: $green;
+  }
+}
+
+.split-bar {
+  @include flex(center, flex-start, 3px);
+  height: 10px;
+}
+
+.split-fill {
+  height: 100%;
+  border-radius: 3px;
+
+  &.equity {
+    background: $blue;
+  }
+  &.income {
+    background: $green;
+  }
 }

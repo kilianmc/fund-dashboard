@@ -68,7 +68,7 @@ export default function PerformanceCard() {
     <section className="card">
       <div className="card-head">
         <div>
-          <div className="card-title">Portfolio Performance</div>
+          <div className="card-title">Performance</div>
           <div className="card-sub">Indexed growth vs. benchmark</div>
         </div>
         <div className="seg">

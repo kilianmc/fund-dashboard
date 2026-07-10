@@ -9,8 +9,8 @@ export default function TopBar() {
       <div className="brand">
         <div className="logo">A</div>
         <div>
-          <h1>Aurelius Asset Management</h1>
-          <p>Private Client Portfolio · Growth Mandate</p>
+          <h1>Asset Management</h1>
+          <p>Private Client Portfolio</p>
         </div>
       </div>
       <div className="topbar-right">

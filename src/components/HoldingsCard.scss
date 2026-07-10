@@ -16,6 +16,10 @@ thead th {
   &:first-child {
     text-align: left;
   }
+  &:nth-child(2),
+  &:nth-child(3) {
+    text-align: center;
+  }
 }
 
 tbody td {
@@ -27,6 +31,10 @@ tbody td {
 
   &:first-child {
     text-align: left;
+  }
+  &:nth-child(2),
+  &:nth-child(3) {
+    text-align: center;
   }
 }
 
@@ -56,23 +64,6 @@ tbody td {
   white-space: nowrap;
 }
 
-.alloc-bar {
-  @include flex(center, flex-end, 10px);
-}
-
-.alloc-track {
-  width: 54px;
-  height: 6px;
-  background: $track;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.alloc-fill {
-  height: 100%;
-  border-radius: 4px;
-}
-
 .pos {
   color: $green;
 }
@@ -80,14 +71,54 @@ tbody td {
   color: $red;
 }
 
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid $line;
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+  }
+  &.equity::before {
+    background: $blue;
+  }
+  &.income::before {
+    background: $green;
+  }
+}
+
 // Scrollable holdings table with pinned header
+.table-wrap {
+  position: relative;
+
+  // Bottom fade hinting at more rows below the fold
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 44px;
+    background: linear-gradient(transparent, $card);
+    pointer-events: none;
+  }
+}
+
 .table-scroll {
-  max-height: 340px;
+  max-height: 320px;
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 
   table {
-    min-width: 440px;
+    min-width: 520px;
   }
   thead th {
     position: sticky;
