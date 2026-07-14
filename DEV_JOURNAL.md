@@ -390,3 +390,19 @@ Goal: mirror Today's Return (value + chip) on the total-value tile.
 - Added a `yield` field to each fund to back the income projection.
 - Set equity yields to the 6–9% range (income funds left at ~2.7–3.6%), lifting
   Est. Annual Income to ≈ €26,700.
+
+## Session — 2026-07-14
+
+### Task 11 — Animated demo of the end result
+
+![Fund portfolio dashboard demo](src/data/demo.gif)
+
+- Captured a scripted tour of the running app (`http://localhost:5173/`) and encoded it
+  as an animated GIF via Playwright (`channel: 'chrome'`, so no browser download), screenshots each state, and encodes the frames with the pure-JS `pngjs` (decode) + `gifenc` (quantize/encode) libraries.
+- The tour, at a 1440px desktop viewport (real 2-column layout) with full-page screenshots:
+  1. landing view, 2. cycle the Performance range toggle (12M / 3Y / 5Y / All),
+  3. switch to dark mode, 4. ranges in dark mode, 5. back to light,
+  6. **scroll the Holdings table** through all 10 funds and back (sticky header stays pinned).
+- Embedded in the [README](README.md#demo) and here.
+
+# END

@@ -9,6 +9,14 @@ This is Project 1 ("AI-as-Copilot") of a two-project portfolio pair — see
 [DEV_JOURNAL.md](DEV_JOURNAL.md) for the full project brief and a chronological
 log of the work.
 
+## Demo
+
+![Fund portfolio dashboard demo](src/data/demo.gif)
+
+> The tour cycles the performance time-range toggle (12M / 3Y / 5Y / All) and
+> switches between light and dark mode. Captured from the running dev server
+> (`npm run dev`) with [`scripts/capture-demo.mjs`](scripts/capture-demo.mjs).
+
 ## Features
 
 - **Portfolio Performance** — indexed line chart vs. S&P 500 benchmark, with a
