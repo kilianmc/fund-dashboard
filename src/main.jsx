@@ -1,14 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './chartSetup';
-import './index.scss';
-import App from './App';
-import { ThemeProvider } from './theme/ThemeContext';
+import RemoteApp from './RemoteApp';
 
+// Standalone entry: mounts the same self-contained component that is exposed
+// as a Module Federation remote (see RemoteApp.jsx and vite.config.js).
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider>
-      <App />
-    </ThemeProvider>
+    <RemoteApp />
   </React.StrictMode>
 );
