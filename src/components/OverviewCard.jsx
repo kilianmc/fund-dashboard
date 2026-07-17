@@ -21,7 +21,7 @@ export default function OverviewCard() {
           <div className="chip up">▲ +{fmtEur(YTD_GAIN)} · {YTD_RETURN} YTD</div>
         </div>
         <div className="kpi">
-          <div className="label">Today's Return</div>
+          <div className="label">Today&apos;s Return</div>
           <div className="value sm">+€1,240</div>
           <div className="chip up">▲ +0.29%</div>
         </div>

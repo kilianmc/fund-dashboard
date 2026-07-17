@@ -1,0 +1,9 @@
+dist
+dist-ssr
+node_modules
+package-lock.json
+*.png
+*.gif
+
+# Work-in-progress dev journal — not part of the source, leave untouched.
+DEV_JOURNAL.md
