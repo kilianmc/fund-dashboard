@@ -84,17 +84,26 @@ npm run lint          # ESLint over the project
 npm run lint:fix      # ESLint with autofix
 npm run format        # Prettier — write formatting
 npm run format:check  # Prettier — verify formatting (used in CI)
+npm test              # Vitest in watch mode
+npm run test:run      # Vitest single run (used in CI)
 ```
 
 - `npm run build:remote` / `npm run serve:remote` build/serve the remote for
   host integration testing.
-- **Lint** (`lint` / `lint:fix`) and **format** (`format` / `format:check`)
-  exist — CI runs `lint`, `format:check`, and `build` on every PR.
-- **Test** commands do not exist yet — they are being added by issue #3. Do not
-  assume `npm test` is available until then.
+- **Lint** (`lint` / `lint:fix`), **format** (`format` / `format:check`), and
+  **test** (`test` / `test:run`) all exist — CI runs `lint`, `format:check`,
+  `test:run`, and `build` on every PR.
+- **Testing stack**: **Vitest** + **React Testing Library** + **jsdom** (config
+  lives in the `test` block of `vite.config.js`; `src/test/setup.js` wires
+  `@testing-library/jest-dom`). Chart.js needs a real `<canvas>`, so component
+  tests that render charts mock `react-chartjs-2`. The MF (`federation`) plugin
+  is skipped under Vitest (`process.env.VITEST`) — builds/dev keep it, so the
+  contract is unchanged.
 
-Requires **Node ≥ 20.19** (`package.json` `engines`); `.nvmrc` pins the local
-version — run `nvm use` to match.
+**Node version — source of truth:** `package.json` `engines` (`>=20.19.0`) is
+the supported **floor**; `.nvmrc` (`23.10.0`) is the **pinned** version used
+locally (`nvm use`) and in CI (`setup-node` reads `.nvmrc`). Any Node ≥ 20.19
+works; use `nvm use` to match CI exactly.
 
 ## Git conventions
 
