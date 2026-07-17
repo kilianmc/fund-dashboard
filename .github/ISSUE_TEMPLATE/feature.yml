@@ -1,7 +1,7 @@
 name: Feature / enhancement
 description: Propose a new feature or improvement for the fund dashboard.
-title: "feat: "
-labels: ["enhancement"]
+title: 'feat: '
+labels: ['enhancement']
 body:
   - type: markdown
     attributes:

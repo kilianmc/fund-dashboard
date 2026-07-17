@@ -14,7 +14,9 @@ export default function TopBar() {
         </div>
       </div>
       <div className="topbar-right">
-        <div className="live-pill"><span className="live-dot"></span> Live · 10:42 CET</div>
+        <div className="live-pill">
+          <span className="live-dot"></span> Live · 10:42 CET
+        </div>
         <button
           className="theme-toggle"
           onClick={toggle}

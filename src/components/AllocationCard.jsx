@@ -1,5 +1,11 @@
 import { Doughnut } from 'react-chartjs-2';
-import { funds, fmtEur, TOTAL_VALUE, EQUITY_PCT, INCOME_PCT } from '../data/portfolio';
+import {
+  funds,
+  fmtEur,
+  TOTAL_VALUE,
+  EQUITY_PCT,
+  INCOME_PCT,
+} from '../data/portfolio';
 import { useTheme } from '../theme/ThemeContext';
 import './AllocationCard.scss';
 
@@ -11,7 +17,10 @@ function makeData(theme) {
         data: funds.map((f) => f.alloc),
         backgroundColor: funds.map((f) => f.color),
         borderColor: theme === 'dark' ? '#161b26' : '#fff',
-        borderWidth: 4, hoverOffset: 8, borderRadius: 6, spacing: 2,
+        borderWidth: 4,
+        hoverOffset: 8,
+        borderRadius: 6,
+        spacing: 2,
       },
     ],
   };
@@ -45,7 +54,11 @@ const options = {
   plugins: {
     legend: { display: false },
     tooltip: {
-      backgroundColor: '#000000', padding: 11, cornerRadius: 10, displayColors: true, boxPadding: 5,
+      backgroundColor: '#000000',
+      padding: 11,
+      cornerRadius: 10,
+      displayColors: true,
+      boxPadding: 5,
       bodyFont: { family: 'Inter', size: 13, weight: '600' },
       callbacks: { label: (c) => '  ' + c.label },
     },
@@ -64,7 +77,11 @@ export default function AllocationCard() {
       </div>
       <div className="donut-layout">
         <div className="donut-wrap">
-          <Doughnut data={makeData(theme)} options={options} plugins={[arcLabels]} />
+          <Doughnut
+            data={makeData(theme)}
+            options={options}
+            plugins={[arcLabels]}
+          />
           <div className="donut-center">
             <div className="dc-val">{fmtEur(TOTAL_VALUE)}</div>
             <div className="dc-lab">Total Portfolio</div>
@@ -79,7 +96,10 @@ export default function AllocationCard() {
                   <div className="dl-name">{f.name}</div>
                   <div className="dl-sub">{fmtEur(f.value)}</div>
                 </div>
-                <span className={`dl-type ${f.type}`} title={f.type === 'income' ? 'Income' : 'Equity'}></span>
+                <span
+                  className={`dl-type ${f.type}`}
+                  title={f.type === 'income' ? 'Income' : 'Equity'}
+                ></span>
                 <div className="dl-pct">{f.alloc}%</div>
               </div>
             ))}
@@ -95,8 +115,14 @@ export default function AllocationCard() {
           </div>
         </div>
         <div className="split-bar">
-          <div className="split-fill equity" style={{ width: `${EQUITY_PCT}%` }}></div>
-          <div className="split-fill income" style={{ width: `${INCOME_PCT}%` }}></div>
+          <div
+            className="split-fill equity"
+            style={{ width: `${EQUITY_PCT}%` }}
+          ></div>
+          <div
+            className="split-fill income"
+            style={{ width: `${INCOME_PCT}%` }}
+          ></div>
         </div>
       </div>
     </section>
