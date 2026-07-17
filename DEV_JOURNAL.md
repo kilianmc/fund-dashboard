@@ -73,18 +73,6 @@ Cloudflare Pages — excellent performance via edge CDN, very generous free tier
 GitHub Pages — free and simple for a static SPA, but no preview deploys or serverless functions; fine as a fallback, weaker for the AI-review workflow.
 Cost, performance, ease of use
 
-All the above cost $0 for portfolio-scale traffic. You only pay if you add serverless compute at scale or want team features.
-Global CDN delivery means fast load times everywhere with no tuning.
-Git-based deploys mean "merge to main = live," which pairs perfectly with your CI setup.
-AI-integration considerations
-
-If either app calls an LLM API at runtime (e.g., a chat feature), never expose API keys in the client — proxy calls through a serverless function (Vercel/Netlify Functions or Cloudflare Workers) and store keys as encrypted environment variables in the host dashboard.
-Set spending limits on any AI API account to avoid surprise bills from a runaway request loop.
-Domain & SSL
-
-Buy one domain (Namecheap, Cloudflare Registrar, or Porkbun; ~$10–15/yr) and use subdomains — e.g., copilot.yourname.dev and agent.yourname.dev, with a root landing page linking both.
-SSL is automatic and free (Let's Encrypt) on all recommended hosts — no manual certificate management needed.
-
 ### STEP 2
 
 Create a modern financial dashboard UI mockup for a fund portfolio on a single-page web application.
