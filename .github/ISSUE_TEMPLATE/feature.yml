@@ -1,0 +1,45 @@
+name: Feature / enhancement
+description: Propose a new feature or improvement for the fund dashboard.
+title: "feat: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the proposal. Keep scope focused — one concern per issue.
+        Remember this app is a Module Federation remote (`fundDashboard`); note
+        any impact on the `./App` contract in Scope/Notes.
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why is this needed? What problem does it solve?
+      placeholder: Background and motivation.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What is in scope (and explicitly out of scope)?
+      placeholder: Files/areas to touch, boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: Checklist that defines "done".
+      value: |
+        - [ ]
+        - [ ] `npm run build` still succeeds
+        - [ ] Module Federation contract unaffected
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else — links, constraints, design references.
+    validations:
+      required: false
