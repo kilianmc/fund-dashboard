@@ -77,15 +77,21 @@ If a change would alter any of the above, call it out explicitly in the PR.
 
 ```bash
 npm install
-npm run dev      # start the dev server (standalone)
-npm run build    # production build to dist/
-npm run preview  # preview the production build
+npm run dev           # start the dev server (standalone)
+npm run build         # production build to dist/
+npm run preview       # preview the production build
+npm run lint          # ESLint over the project
+npm run lint:fix      # ESLint with autofix
+npm run format        # Prettier — write formatting
+npm run format:check  # Prettier — verify formatting (used in CI)
 ```
 
 - `npm run build:remote` / `npm run serve:remote` build/serve the remote for
   host integration testing.
-- **Lint** and **test** commands do not exist yet — they are being added by
-  issues #2 (lint) and #3 (test). Do not assume they are available until then.
+- **Lint** (`lint` / `lint:fix`) and **format** (`format` / `format:check`)
+  exist — CI runs `lint`, `format:check`, and `build` on every PR.
+- **Test** commands do not exist yet — they are being added by issue #3. Do not
+  assume `npm test` is available until then.
 
 Requires **Node ≥ 20.19** (`package.json` `engines`); `.nvmrc` pins the local
 version — run `nvm use` to match.

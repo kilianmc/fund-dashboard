@@ -1,4 +1,11 @@
-import { funds, fmtEur, fmtSigned, signClass, TOTAL_VALUE, YTD_RETURN } from '../data/portfolio';
+import {
+  funds,
+  fmtEur,
+  fmtSigned,
+  signClass,
+  TOTAL_VALUE,
+  YTD_RETURN,
+} from '../data/portfolio';
 import './HoldingsCard.scss';
 
 export default function HoldingsCard() {
@@ -11,37 +18,49 @@ export default function HoldingsCard() {
         </div>
       </div>
       <div className="table-wrap">
-      <div className="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Fund</th><th>Type</th><th>Allocation</th><th>Value</th><th>Daily</th><th>YTD</th>
-            </tr>
-          </thead>
-          <tbody>
-            {funds.map((f) => (
-              <tr key={f.name}>
-                <td>
-                  <div className="fund-cell">
-                    <span className="dot" style={{ background: f.color }}></span>
-                    <div>
-                      <div className="fund-name">{f.name}</div>
-                      <div className="fund-tag">{f.tag}</div>
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <span className={`type-badge ${f.type}`}>{f.type === 'income' ? 'Income' : 'Equity'}</span>
-                </td>
-                <td>{f.alloc}%</td>
-                <td>{fmtEur(f.value)}</td>
-                <td className={signClass(f.daily)}>{fmtSigned(f.daily, 2)}</td>
-                <td className={signClass(f.ytd)}>{fmtSigned(f.ytd, 1)}</td>
+        <div className="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Fund</th>
+                <th>Type</th>
+                <th>Allocation</th>
+                <th>Value</th>
+                <th>Daily</th>
+                <th>YTD</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {funds.map((f) => (
+                <tr key={f.name}>
+                  <td>
+                    <div className="fund-cell">
+                      <span
+                        className="dot"
+                        style={{ background: f.color }}
+                      ></span>
+                      <div>
+                        <div className="fund-name">{f.name}</div>
+                        <div className="fund-tag">{f.tag}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={`type-badge ${f.type}`}>
+                      {f.type === 'income' ? 'Income' : 'Equity'}
+                    </span>
+                  </td>
+                  <td>{f.alloc}%</td>
+                  <td>{fmtEur(f.value)}</td>
+                  <td className={signClass(f.daily)}>
+                    {fmtSigned(f.daily, 2)}
+                  </td>
+                  <td className={signClass(f.ytd)}>{fmtSigned(f.ytd, 1)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
       <div className="foot-strip">
         <div className="foot-block">

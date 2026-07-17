@@ -1,4 +1,12 @@
-import { fmtEur, TOTAL_VALUE, YTD_RETURN, YTD_GAIN, BEST_PERFORMER, EST_ANNUAL_INCOME, perfData } from '../data/portfolio';
+import {
+  fmtEur,
+  TOTAL_VALUE,
+  YTD_RETURN,
+  YTD_GAIN,
+  BEST_PERFORMER,
+  EST_ANNUAL_INCOME,
+  perfData,
+} from '../data/portfolio';
 import './OverviewCard.scss';
 
 export default function OverviewCard() {
@@ -18,10 +26,12 @@ export default function OverviewCard() {
         <div className="kpi">
           <div className="label">Total Portfolio Value</div>
           <div className="value">{fmtEur(TOTAL_VALUE)}</div>
-          <div className="chip up">▲ +{fmtEur(YTD_GAIN)} · {YTD_RETURN} YTD</div>
+          <div className="chip up">
+            ▲ +{fmtEur(YTD_GAIN)} · {YTD_RETURN} YTD
+          </div>
         </div>
         <div className="kpi">
-          <div className="label">Today's Return</div>
+          <div className="label">Today&apos;s Return</div>
           <div className="value sm">+€1,240</div>
           <div className="chip up">▲ +0.29%</div>
         </div>
@@ -31,7 +41,9 @@ export default function OverviewCard() {
         </div>
         <div className="kpi">
           <div className="label">Best Performer (YTD)</div>
-          <div className="value sm">{BEST_PERFORMER.name.replace('Vanguard ', '')}</div>
+          <div className="value sm">
+            {BEST_PERFORMER.name.replace('Vanguard ', '')}
+          </div>
           <div className="chip up">▲ +{BEST_PERFORMER.ytd}%</div>
         </div>
         <div className="kpi">
