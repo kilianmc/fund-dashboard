@@ -33,8 +33,8 @@ src/
     ThemeContext.jsx        # ThemeProvider + useTheme() hook
   chartSetup.js             # registers Chart.js components
   App.jsx                   # composes the dashboard
-  main.jsx                  # standalone entry; wraps App in <ThemeProvider>
-  RemoteApp.jsx             # Module Federation entry (see contract below)
+  main.jsx                  # standalone entry; renders <RemoteApp /> (StrictMode)
+  RemoteApp.jsx             # MF entry; imports index.scss + chartSetup, wraps App in <ThemeProvider>
   index.scss                # tokens (:root + [data-theme='dark']), reset, .app/.grid/.card
 ```
 
