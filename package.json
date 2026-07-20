@@ -1,7 +1,7 @@
 {
   "name": "ai-portfolio-project1",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "engines": {
     "node": ">=20.19.0"
@@ -17,7 +17,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "version:dev": "npm version minor --no-git-tag-version",
+    "version:release": "npm version major --no-git-tag-version"
   },
   "dependencies": {
     "chart.js": "^4.4.1",
