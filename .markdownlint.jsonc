@@ -1,0 +1,7 @@
+{
+  // Align markdownlint with Prettier, which is the enforced CI gate (format:check).
+  // These rules conflict with Prettier's markdown output or with our doc style.
+  "MD013": false, // line length — Prettier owns wrapping
+  "MD024": { "siblings_only": true }, // allow repeated headings under different sections
+  "MD041": false, // some docs (e.g. templates) don't lead with an H1
+}

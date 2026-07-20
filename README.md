@@ -3,11 +3,22 @@
 A responsive fund portfolio dashboard built with **React + Vite** and **Chart.js**
 (via `react-chartjs-2`), styled with **SCSS** and a runtime-switchable
 **light/dark theme**. Ported from a single-file HTML prototype into a
-component-based React app.
+component-based React app. It ships as a **Module Federation remote**
+(`fundDashboard`) consumed by the [portfolio-shell](https://github.com/kilianmc/portfolio-shell)
+host at [kilianmc.com](https://kilianmc.com).
 
-This is Project 1 ("AI-as-Copilot") of a two-project portfolio pair — see
-[DEV_JOURNAL.md](DEV_JOURNAL.md) for the full project brief and a chronological
-log of the work.
+This is Project 1 ("AI-as-Copilot") of a two-project portfolio pair. The
+developer journal — the full project brief and a chronological log of the work
+across both projects — now lives in the portfolio shell: read it on the live
+site at [kilianmc.com](https://kilianmc.com) under **Dev Journal**, or in the
+source at
+[`portfolio-shell/docs/DEV_JOURNAL.md`](https://github.com/kilianmc/portfolio-shell/blob/main/docs/DEV_JOURNAL.md).
+
+> **This project intentionally stays plain JavaScript.** It is the fast/simple
+> "AI-as-Copilot" half of the pair, kept deliberately lightweight (no
+> TypeScript, no `tsconfig`). Its host — `portfolio-shell` — is the typed,
+> strict-TypeScript "AI-as-Agent" counterpart. The contrast between the two repos
+> is intentional and part of the portfolio's story.
 
 ## Demo
 
@@ -35,7 +46,7 @@ log of the work.
 
 ## Project structure
 
-```
+```text
 src/
   data/portfolio.js         # fund data, performance series, formatting helpers
   components/               # TopBar, PerformanceCard, OverviewCard, HoldingsCard, AllocationCard
@@ -63,3 +74,13 @@ npm run preview  # preview the production build
 > Requires **Node ≥ 20.19** (see `package.json` `engines`). The repo pins
 > Node 23.10 via `.nvmrc` — run `nvm use` to match. Built on Vite 8 with
 > `@vitejs/plugin-react` and `sass`.
+
+## Deployment (dev → prod)
+
+Two long-lived branches: **`dev`** (integration) and **`main`** (production).
+Feature PRs target `dev`; `main` only receives `dev`→`main` promotion PRs after
+the dev deploy is tested. Vercel auto-deploys `dev` to a stable dev URL and
+`main` to production — both serving `remoteEntry.js` for the shell to consume per
+environment via `VITE_FUND_REMOTE_URL`. Production baseline is `1.0.0`; dev
+bumps the minor (`npm run version:dev`), releases bump the major
+(`npm run version:release`). Both branches gate on a green `lint-build` check.
