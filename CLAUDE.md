@@ -110,6 +110,46 @@ works; use `nvm use` to match CI exactly.
 - **Conventional Commits**: `type: subject` (e.g. `feat:`, `fix:`, `chore:`,
   `test:`, `docs:`). Reference the issue in the body with `Closes #N`.
 - **Branch names** by type: `feat/…`, `fix/…`, `chore/…`, `test/…`, `docs/…`.
+- **Feature PRs target `dev`**, not `main`. `main` receives only `dev`→`main`
+  promotion PRs. See **Deployment (dev→prod)** below.
+
+## Deployment (dev→prod)
+
+This repo follows a two-branch dev→prod flow. It is a Module Federation
+**remote**, so its deploys produce the `remoteEntry.js` URLs the
+`portfolio-shell` host consumes via `VITE_FUND_REMOTE_URL`.
+
+- **Branch model**: two long-lived branches — `dev` (integration) and `main`
+  (production). Feature PRs target `dev`. `main` receives **only** `dev`→`main`
+  promotion PRs; never push features straight to `main`.
+- **Vercel deploys** (Git integration): the `dev` branch auto-deploys to a
+  stable dev URL; `main` deploys to production.
+- **Promotion / approval**: Kilian manually tests the dev URL, then merges a
+  `dev`→`main` promotion PR to ship to production. Merging is Kilian's gate.
+- **Gate / ruleset**: every PR (into `dev` and into `main`) requires the
+  `lint-build` CI job to pass — it runs `npm run lint`, `npm run format:check`,
+  `npm run test:run`, and `npm run build`.
+
+### Versioning convention
+
+- Baseline production = **1.0.0**. Production releases are whole majors.
+- Each dev iteration bumps the **minor** (`1.1.0` → `1.2.0` …) via
+  `npm run version:dev` (`npm version minor --no-git-tag-version`).
+- Each production release bumps the **major** and resets the minor
+  (→ `2.0.0`) via `npm run version:release`
+  (`npm version major --no-git-tag-version`).
+
+### remoteEntry URLs (for the shell's `VITE_FUND_REMOTE_URL`)
+
+- **Production**: `https://ai-portfolio-project1.vercel.app/remoteEntry.js`
+- **Dev** (Vercel git-branch URL pattern):
+  `https://ai-portfolio-project1-git-dev-kilianmc.vercel.app/remoteEntry.js`
+  — Kilian must confirm the exact dev URL from the Vercel dashboard after the
+  first `dev` deploy; the branch slug can vary.
+
+The `Access-Control-Allow-Origin: *` header in `vercel.json` is what lets the
+shell load `remoteEntry.js` cross-origin — keep it. See `docs/DEPLOYMENT.md`
+for the Vercel dashboard checklist.
 
 ## PR expectations
 
