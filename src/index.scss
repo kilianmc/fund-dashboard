@@ -7,7 +7,10 @@
   --card: #ffffff;
   --ink: #0d1b2a;
   --ink-2: #5a6b7b;
-  --ink-3: #93a1af;
+  // Tertiary/faint text. Darkened from #93a1af (~2.6:1 on white — fails WCAG AA)
+  // to meet ~4.5:1 for value/label text in light mode; still lighter than
+  // --ink-2 so the type hierarchy is preserved. Dark mode is unchanged.
+  --ink-3: #64748b;
   --line: #eef1f5;
   --blue: #2563eb;
   --green: #12a150;
