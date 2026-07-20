@@ -31,13 +31,19 @@ checklist for Kilian.
 
 ## remoteEntry.js URLs (for the shell)
 
-| Environment | URL                                                                        |
-| ----------- | -------------------------------------------------------------------------- |
-| Production  | `https://ai-portfolio-project1.vercel.app/remoteEntry.js`                  |
-| Dev         | `https://ai-portfolio-project1-git-dev-kilianmc.vercel.app/remoteEntry.js` |
+| Environment | URL                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| Production  | `https://ai-portfolio-project1.vercel.app/remoteEntry.js`                                   |
+| Dev         | `https://ai-portfolio-project1-git-dev-kilians-projects-7425dee2.vercel.app/remoteEntry.js` |
 
-> ⚠️ **Confirm the dev slug.** The dev URL follows Vercel's
-> `<project>-git-<branch>-<scope>.vercel.app` pattern, but the exact slug can
-> vary. Verify it from the Vercel dashboard (Deployments → the `dev` branch
-> deployment) after the first `dev` deploy, and update the shell's
-> `VITE_FUND_REMOTE_URL` to match.
+> ✅ **Confirmed 2026-07-20.** The dev slug is the Vercel team scope
+> `kilians-projects-7425dee2` (not the personal `kilianmc` handle). The
+> `-git-dev-` alias is **stable** across dev builds, so the shell's
+> `VITE_FUND_REMOTE_URL` Preview scope can point at it permanently.
+
+> ⚠️ **Deployment Protection must stay OFF for previews.** Vercel Authentication
+> (Settings → Deployment Protection) gates non-production deploys behind an SSO
+> login by default (`ssoProtection: all_except_custom_domains`). That returns a
+> `302 → vercel.com/sso-api` for `remoteEntry.js`, so the shell can never load
+> the dev remote cross-origin. It was set to **Disabled** on 2026-07-20; keep it
+> off or the dev (and any preview) remote will silently fail to mount.
