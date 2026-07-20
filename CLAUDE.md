@@ -142,10 +142,11 @@ This repo follows a two-branch dev→prod flow. It is a Module Federation
 ### remoteEntry URLs (for the shell's `VITE_FUND_REMOTE_URL`)
 
 - **Production**: `https://ai-portfolio-project1.vercel.app/remoteEntry.js`
-- **Dev** (Vercel git-branch URL pattern):
-  `https://ai-portfolio-project1-git-dev-kilianmc.vercel.app/remoteEntry.js`
-  — Kilian must confirm the exact dev URL from the Vercel dashboard after the
-  first `dev` deploy; the branch slug can vary.
+- **Dev** (stable Vercel git-branch alias, confirmed 2026-07-20):
+  `https://ai-portfolio-project1-git-dev-kilians-projects-7425dee2.vercel.app/remoteEntry.js`
+  — the slug uses the team scope `kilians-projects-7425dee2`. Note: Vercel
+  Deployment Protection must stay **off** for previews, or the dev remote is
+  SSO-gated and won't load cross-origin (see `docs/DEPLOYMENT.md`).
 
 The `Access-Control-Allow-Origin: *` header in `vercel.json` is what lets the
 shell load `remoteEntry.js` cross-origin — keep it. See `docs/DEPLOYMENT.md`
