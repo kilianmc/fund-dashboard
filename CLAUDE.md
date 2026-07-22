@@ -100,10 +100,10 @@ npm run test:run      # Vitest single run (used in CI)
   is skipped under Vitest (`process.env.VITEST`) — builds/dev keep it, so the
   contract is unchanged.
 
-**Node version — source of truth:** `package.json` `engines` (`>=20.19.0`) is
-the supported **floor**; `.nvmrc` (`23.10.0`) is the **pinned** version used
-locally (`nvm use`) and in CI (`setup-node` reads `.nvmrc`). Any Node ≥ 20.19
-works; use `nvm use` to match CI exactly.
+**Node version — source of truth:** `package.json` `engines` (`>=22.12.0`) is
+the supported **floor**; `.nvmrc` (`24`, current LTS) is the **pinned** version
+used locally (`nvm use`) and in CI (`setup-node` reads `.nvmrc`). Any Node ≥
+22.12 works; use `nvm use` to match CI exactly.
 
 ## Git conventions
 
