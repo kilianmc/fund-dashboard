@@ -30,15 +30,24 @@ source at
 
 ## Features
 
+- **Load your own holdings** — import a portfolio from a **JSON or CSV** file
+  (`fund ISIN, shares, cost-basis price, optional type`). The built-in data is
+  the default until a file is loaded; "Reset to default" restores it. See
+  [Importing holdings](#importing-holdings).
+- **Live market value** — imported holdings are priced against **live fund NAV**
+  via a small serverless proxy (`/api/nav`), so market value, cost, and
+  **gain/loss** are computed from `shares × current NAV` vs your cost basis. A
+  fund that can't be priced shows a per-line error and is excluded from totals —
+  the rest still load.
 - **Portfolio Performance** — indexed line chart vs. S&P 500 benchmark, with a
   12M / 3Y / 5Y / All time-range toggle. Gridlines adapt to the active theme.
-- **Portfolio Overview** — headline KPIs (total value, today's return, YTD,
-  annualized, risk, volatility, dividend yield) plus best-performing-fund and
-  largest-holding mini-cards.
-- **Holdings** — table of funds with a sticky header and vertical/horizontal
-  scroll so nothing is clipped on small screens.
-- **Allocation** — donut chart with a scrollable legend; segment borders match
-  the card background per theme.
+- **Portfolio Overview** — headline KPIs (total value, gain/loss, best performer,
+  est. income, …) that recompute from the loaded data.
+- **Holdings** — table of funds (Fund · Shares · Cost · Actual · Value ·
+  Gain/Loss) with a sticky header and scroll. Amounts use a compact European
+  format (e.g. `42,5K €`).
+- **Allocation** — donut chart with a scrollable legend and an equity/income
+  asset mix; segment borders match the card background per theme.
 - **Dark mode** — 🌙/☀️ toggle in the top bar, persisted to `localStorage` and
   defaulting to the OS `prefers-color-scheme`.
 - Fully responsive across three breakpoints (desktop ≥1025px, tablet
@@ -47,9 +56,16 @@ source at
 ## Project structure
 
 ```text
+api/
+  nav.js                    # serverless NAV-by-ISIN proxy (Vercel function; keyless Yahoo)
 src/
-  data/portfolio.js         # fund data, performance series, formatting helpers
-  components/               # TopBar, PerformanceCard, OverviewCard, HoldingsCard, AllocationCard
+  data/
+    portfolio.js            # default fund data + pure deriveMetrics/enrichFunds + formatters
+    PortfolioDataContext.jsx# provider + usePortfolioData() — default vs imported state
+    fundCatalog.js          # ISIN → metadata, colour palette, type normalisation
+  services/navService.js    # fetchNav(isins) → calls /api/nav
+  utils/parseHoldingsFile.js# parse + validate a JSON/CSV holdings file
+  components/               # TopBar, PerformanceCard, OverviewCard, HoldingsCard, AllocationCard, ImportControl
     *.jsx / *.scss          # each component paired with its own stylesheet
   styles/
     _variables.scss         # SCSS tokens → CSS custom properties
@@ -58,7 +74,8 @@ src/
     ThemeContext.jsx        # ThemeProvider + useTheme() hook
   chartSetup.js             # registers Chart.js components
   App.jsx                   # composes the dashboard
-  main.jsx                  # entry point; wraps App in <ThemeProvider>
+  main.jsx                  # standalone entry
+  RemoteApp.jsx             # MF entry; wraps App in <ThemeProvider> + <PortfolioDataProvider>
   index.scss                # tokens (:root + [data-theme='dark']), reset, .app/.grid/.card
 ```
 
@@ -74,6 +91,33 @@ npm run preview  # preview the production build
 > Requires **Node ≥ 20.19** (see `package.json` `engines`). The repo pins
 > Node 23.10 via `.nvmrc` — run `nvm use` to match. Built on Vite 8 with
 > `@vitejs/plugin-react` and `sass`.
+
+## Importing holdings
+
+Use **Import** in the top bar to load a `.json` or `.csv` file. Each record is a
+fund **ISIN**, number of **shares**, **cost-basis** price per share, and an
+optional **type** (`equity` / `income`):
+
+```csv
+isin,shares,price,type
+IE0032620787,639,37.50,equity
+```
+
+```json
+[{ "id": "IE0032620787", "shares": 639, "price": 37.5, "type": "equity" }]
+```
+
+Sample files live in [`public/`](public). The dashboard resolves the current NAV
+per ISIN through the **`/api/nav`** serverless function (keyless, server-side —
+these Irish EUR mutual funds have no free browser-CORS price source), then
+computes market value and gain/loss vs your cost basis. Whole-dashboard figures
+(Holdings, Allocation, Overview) recompute from the imported data; a fund that
+can't be priced is flagged per-line and excluded from totals. The performance
+chart keeps its indexed series (a file carries no history).
+
+Point the client at the function origin with **`VITE_NAV_API_URL`** (see
+[`.env.example`](.env.example)); left unset it calls the same origin, so use
+`vercel dev` to run the app and the function together locally.
 
 ## Deployment (dev → prod)
 
