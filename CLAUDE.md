@@ -22,9 +22,16 @@ A responsive fund portfolio dashboard.
 ## Project structure
 
 ```
+api/
+  nav.js                    # serverless NAV-by-ISIN proxy (Vercel function; keyless Yahoo)
 src/
-  data/portfolio.js         # fund data, performance series, formatting helpers
-  components/               # TopBar, PerformanceCard, OverviewCard, HoldingsCard, AllocationCard
+  data/
+    portfolio.js            # default fund data + pure deriveMetrics/enrichFunds + formatters
+    PortfolioDataContext.jsx# provider + usePortfolioData() — default vs imported state
+    fundCatalog.js          # ISIN → metadata, colour palette, normalizeType()
+  services/navService.js    # fetchNav(isins) → GET /api/nav
+  utils/parseHoldingsFile.js# parse + validate a JSON/CSV holdings file → [{id,shares,price,type?}]
+  components/               # TopBar, PerformanceCard, OverviewCard, HoldingsCard, AllocationCard, ImportControl
     *.jsx / *.scss          # each component paired with its own stylesheet
   styles/
     _variables.scss         # SCSS tokens
@@ -34,9 +41,41 @@ src/
   chartSetup.js             # registers Chart.js components
   App.jsx                   # composes the dashboard
   main.jsx                  # standalone entry; renders <RemoteApp /> (StrictMode)
-  RemoteApp.jsx             # MF entry; imports index.scss + chartSetup, wraps App in <ThemeProvider>
+  RemoteApp.jsx             # MF entry; wraps App in <ThemeProvider> + <PortfolioDataProvider>
   index.scss                # tokens (:root + [data-theme='dark']), reset, .app/.grid/.card
 ```
+
+## Holdings import + live NAV
+
+The dashboard renders **default** static data from `portfolio.js` until a user
+imports a file, after which the whole dashboard is driven by live-priced imported
+holdings.
+
+- **Import** — `utils/parseHoldingsFile.js` accepts a JSON or CSV file of
+  `{ id (ISIN), shares, price (cost basis), type? }` (key aliases + validation;
+  optional `type` normalised via `normalizeType`). `ImportControl` (in `TopBar`)
+  drives it plus reset/status.
+- **State** — data lives in `PortfolioDataContext` (`usePortfolioData()`), mirror
+  of `ThemeContext`. Value: `{ status, source: 'default'|'imported', funds,
+totals, perf, fileName, error, actions }`. Components read the hook, not the
+  module constants.
+- **Pure math** — `portfolio.js` exports pure `enrichFunds(rawHoldings, quotes,
+catalog)` and `deriveMetrics(funds)` so default and imported data run identical
+  logic. Allocation is **derived** (`value / TOTAL_VALUE`); colours are assigned
+  by position (never collide). Money is formatted compactly (`fmtEur` → K/M,
+  European digits, `€` suffix; `fmtCompact` → whole numbers, no symbol).
+- **Live NAV** — `services/navService.js` `fetchNav(isins)` calls the serverless
+  proxy **`api/nav.js`** (`GET /api/nav?isin=…`). The proxy resolves ISIN→NAV
+  **server-side** and keyless (Yahoo search→chart), tolerant per-ISIN
+  (`Promise.allSettled` → `{ quotes, errors }`), with CORS + `s-maxage` cache.
+  This exists because these Irish EUR daily-NAV mutual funds have **no free
+  browser-CORS** price source. The frontend base URL is `VITE_NAV_API_URL`
+  (defaults to same origin); the proxy needs **no** API key.
+- **Errors** — a malformed file → `status: 'error'` (previous data kept). An
+  unpriceable fund → per-line "Unavailable", excluded from totals/donut — never a
+  whole-app failure.
+- **MF-safe** — `api/nav.js` is an additive Vercel function; it does not touch the
+  Module Federation contract. `main.jsx`/`RemoteApp.jsx` stay self-contained.
 
 ## Module Federation contract (do not break)
 
