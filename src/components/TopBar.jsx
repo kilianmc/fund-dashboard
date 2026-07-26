@@ -1,4 +1,5 @@
 import { useTheme } from '../theme/ThemeContext';
+import ImportControl from './ImportControl';
 import './TopBar.scss';
 
 export default function TopBar() {
@@ -14,6 +15,7 @@ export default function TopBar() {
         </div>
       </div>
       <div className="topbar-right">
+        <ImportControl />
         <div className="live-pill">
           <span className="live-dot"></span> Live · 10:42 CET
         </div>
