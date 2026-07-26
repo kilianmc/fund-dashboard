@@ -8,13 +8,20 @@ vi.mock('react-chartjs-2', () => ({
   Doughnut: () => <div data-testid="chart-doughnut" />,
 }));
 
+// The default dataset renders without any fetch, but mock the NAV service so the
+// smoke test stays deterministic and never touches the network.
+vi.mock('./services/navService', () => ({ fetchNav: vi.fn() }));
+
 import App from './App';
 import { ThemeProvider } from './theme/ThemeContext';
+import { PortfolioDataProvider } from './data/PortfolioDataContext';
 
 function renderApp() {
   return render(
     <ThemeProvider>
-      <App />
+      <PortfolioDataProvider>
+        <App />
+      </PortfolioDataProvider>
     </ThemeProvider>,
   );
 }
@@ -55,7 +62,7 @@ describe('<App /> smoke render', () => {
 
   it('shows the formatted total portfolio value from the data module', () => {
     renderApp();
-    // fmtEur(TOTAL_VALUE) === '€425,800'; appears in Overview and Holdings foot.
-    expect(screen.getAllByText('€425,800').length).toBeGreaterThan(0);
+    // fmtEur(TOTAL_VALUE) === '425,8K €'; appears in Overview and Holdings foot.
+    expect(screen.getAllByText('425,8K €').length).toBeGreaterThan(0);
   });
 });

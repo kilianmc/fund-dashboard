@@ -6,11 +6,14 @@ import './chartSetup';
 import './index.scss';
 import App from './App';
 import { ThemeProvider } from './theme/ThemeContext';
+import { PortfolioDataProvider } from './data/PortfolioDataContext';
 
 export default function RemoteApp() {
   return (
     <ThemeProvider>
-      <App />
+      <PortfolioDataProvider>
+        <App />
+      </PortfolioDataProvider>
     </ThemeProvider>
   );
 }
