@@ -16,10 +16,6 @@ thead th {
   &:first-child {
     text-align: left;
   }
-  &:nth-child(2),
-  &:nth-child(3) {
-    text-align: center;
-  }
 }
 
 tbody td {
@@ -32,14 +28,29 @@ tbody td {
   &:first-child {
     text-align: left;
   }
-  &:nth-child(2),
-  &:nth-child(3) {
-    text-align: center;
-  }
+}
+
+// Horizontal breathing room between columns (edges stay flush).
+thead th + th,
+tbody td + td {
+  padding-left: 20px;
+}
+
+// Keep the Fund column from dominating: cap it and let long names/tags
+// truncate so the numeric columns get room to breathe.
+thead th:first-child,
+tbody td:first-child {
+  width: 34%;
+  max-width: 220px;
 }
 
 .fund-cell {
   @include flex(center, flex-start, 11px);
+  min-width: 0; // allow the text block to shrink for ellipsis
+}
+
+.fund-meta {
+  min-width: 0;
 }
 
 .dot {
@@ -62,6 +73,8 @@ tbody td {
 .fund-name,
 .fund-tag {
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .pos {
@@ -71,28 +84,37 @@ tbody td {
   color: $red;
 }
 
-.type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+// Gain/Loss is always stacked: euros on top, percent below (inherits the
+// pos/neg colour from the parent td/.fv).
+.gain-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.25;
+}
+.gain-pct {
   font-size: 11.5px;
   font-weight: 600;
-  padding: 3px 9px;
-  border-radius: 999px;
-  border: 1px solid $line;
+  opacity: 0.8;
+}
 
-  &::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 2px;
-  }
-  &.equity::before {
-    background: $blue;
-  }
-  &.income::before {
-    background: $green;
-  }
+// Header notice shown when one or more imported funds have no live NAV and are
+// therefore excluded from the portfolio totals.
+.price-error-notice {
+  @include uppercase-label($red);
+  border: 1px solid $red;
+  border-radius: 999px;
+  padding: 4px 10px;
+  max-width: 220px;
+  text-align: right;
+  line-height: 1.3;
+}
+
+// Per-line error cell (Market Value / Gain-Loss) for an unpriceable fund.
+.unavailable {
+  color: $red;
+  font-weight: 700;
+  font-style: italic;
 }
 
 // Scrollable holdings table with pinned header
@@ -151,8 +173,11 @@ tfoot td {
     font-weight: 800;
     margin-top: 3px;
 
-    &.green {
+    &.pos {
       color: $green;
+    }
+    &.neg {
+      color: $red;
     }
   }
 }

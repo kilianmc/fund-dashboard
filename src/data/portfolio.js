@@ -1,5 +1,51 @@
+import {
+  FUND_CATALOG,
+  PALETTE,
+  getMetadata,
+  normalizeType,
+} from './fundCatalog';
+
 // ---- Formatting helpers ----
-export const fmtEur = (v) => '€' + Math.round(v).toLocaleString('en-US');
+// European, always-compact euro formatter: K/M suffixes, € after the number
+// with a space, decimal comma (de-DE), up to 2 decimals with trailing zeros
+// dropped, minus before the number. Global — used everywhere euros are shown.
+export const fmtEur = (v) => {
+  const n = Number(v) || 0;
+  const sign = n < 0 ? '-' : '';
+  const abs = Math.abs(n);
+  let num = abs;
+  let suffix = '';
+  if (abs >= 1_000_000) {
+    num = abs / 1_000_000;
+    suffix = 'M';
+  } else if (abs >= 1_000) {
+    num = abs / 1_000;
+    suffix = 'K';
+  }
+  const digits = num.toLocaleString('de-DE', { maximumFractionDigits: 2 });
+  return `${sign}${digits}${suffix} €`;
+};
+// Signed euro for KPI copy: fmtEur already emits the minus for negatives, so
+// only prepend '+' for non-negative values.
+export const fmtEurSigned = (v) =>
+  ((Number(v) || 0) >= 0 ? '+' : '') + fmtEur(v);
+// Compact number (no € symbol, whole numbers): K/M suffixes, European digits,
+// minus before the number. Used for the Holdings Cost/Actual/Value columns.
+export const fmtCompact = (v) => {
+  const n = Number(v) || 0;
+  const sign = n < 0 ? '-' : '';
+  const abs = Math.abs(n);
+  let num = abs;
+  let suffix = '';
+  if (abs >= 1_000_000) {
+    num = abs / 1_000_000;
+    suffix = 'M';
+  } else if (abs >= 1_000) {
+    num = abs / 1_000;
+    suffix = 'K';
+  }
+  return sign + Math.round(num).toLocaleString('de-DE') + suffix;
+};
 export const signClass = (v) => (v >= 0 ? 'pos' : 'neg');
 export const fmtSigned = (v, d) => (v >= 0 ? '+' : '') + v.toFixed(d) + '%';
 
@@ -219,3 +265,169 @@ export const perfRanges = [
   { key: '5y', label: '5Y' },
   { key: 'all', label: 'All' },
 ];
+
+// ============================================================================
+// Holdings model: default dataset + pure derivation helpers
+// ----------------------------------------------------------------------------
+// The dashboard state is driven by "raw holdings" (id/shares + a price) that are
+// enriched with catalog metadata and (for imports) live NAV, then reduced to a
+// set of derived metrics. Both the default dataset and imported files run this
+// same math via `enrichFunds` + `deriveMetrics`, so the two paths stay identical.
+// ============================================================================
+
+// Default holdings. Each carries its own mock `price` (current NAV) and a
+// `costBasis` below it so gains render realistically; shares × price reproduce
+// the original per-fund values and sum to the ~€425,800 headline total. Keys map
+// to the default entries in FUND_CATALOG (plausible ISINs; not live-fetched).
+export const DEFAULT_HOLDINGS = [
+  { id: 'IE00B945VV12', shares: 400, costBasis: 188.0, price: 212.9 }, // EuroStocks
+  { id: 'IE00B3XXRP09', shares: 300, costBasis: 210.0, price: 255.48 }, // S&P 500
+  { id: 'IE00B3VVMM84', shares: 300, costBasis: 152.0, price: 170.32 }, // Emerging Mkts
+  { id: 'IE00B3RBWM25', shares: 200, costBasis: 189.0, price: 212.9 }, // FTSE All-World
+  { id: 'IE00B18GC888', shares: 400, costBasis: 92.5, price: 95.81 }, // Global Bond
+  { id: 'IE00B3S5XW04', shares: 200, costBasis: 154.0, price: 170.32 }, // Total Intl Stock
+  { id: 'IE00B5BMR087', shares: 200, costBasis: 141.0, price: 149.03 }, // Real Estate
+  { id: 'IE00BF4RFH31', shares: 200, costBasis: 110.0, price: 127.74 }, // Small-Cap
+  { id: 'IE00B8GKDB10', shares: 200, costBasis: 98.0, price: 106.45 }, // Dividend Appr.
+  { id: 'IE00BGV5VN51', shares: 100, costBasis: 172.0, price: 212.88 }, // Info Technology
+];
+
+// Read a quote for an ISIN out of either a Map (from navService) or a plain
+// object (`{ [isin]: quote }`), so callers/tests can pass whichever is handy.
+function readQuote(quotesMap, isin) {
+  if (!quotesMap) return undefined;
+  if (quotesMap instanceof Map) return quotesMap.get(isin);
+  return quotesMap[isin];
+}
+
+// Merge raw holdings + live NAV quotes + catalog/fallback metadata into fully
+// normalized fund objects. Pure: no I/O, returns fresh objects.
+//   - `price` = live NAV when available; otherwise the holding's own mock price
+//     (default dataset). An imported fund with no quote CANNOT be priced: it is
+//     flagged `priceError` with null price/value/gain — we never fabricate a
+//     market value from the cost basis.
+//   - `costBasis`/`cost` are always known from the file (purchase price × shares)
+//     and render even for a `priceError` fund.
+//   - `ytd`/`yield` come from catalog metadata (default funds) and are null for
+//     imported funds, whose metadata carries neither.
+export function enrichFunds(rawHoldings, quotesMap, catalog = FUND_CATALOG) {
+  return rawHoldings.map((h, index) => {
+    const id = String(h.id).trim().toUpperCase();
+    const quote = readQuote(quotesMap, id);
+    const meta = catalog[id] || getMetadata(id, quote?.name);
+
+    // Type precedence: file-provided normalized type → catalog type → 'equity'.
+    const type = normalizeType(h.type) ?? meta.type ?? 'equity';
+
+    const hasCostBasis = h.costBasis != null;
+    const costBasis = hasCostBasis ? h.costBasis : h.price;
+    const shares = h.shares;
+    const cost = shares * costBasis;
+
+    const navPrice = quote?.price;
+    let price;
+    let priceError;
+    if (typeof navPrice === 'number' && Number.isFinite(navPrice)) {
+      price = navPrice;
+      priceError = false;
+    } else if (hasCostBasis) {
+      // Default dataset: trust its own mock price (no live NAV expected).
+      price = h.price;
+      priceError = false;
+    } else {
+      // Imported holding with no live NAV: it can't be priced. Surface a
+      // per-line error instead of inventing a value from the cost basis.
+      price = null;
+      priceError = true;
+    }
+
+    const base = {
+      id,
+      name: meta.name,
+      tag: meta.tag,
+      type,
+      // Colour by array position so every fund (known or unknown) gets a
+      // distinct palette colour with no catalog/index collisions.
+      color: PALETTE[index % PALETTE.length],
+      shares,
+      costBasis,
+      cost,
+      ytd: meta.ytd ?? null,
+      yield: meta.yield ?? null,
+      currency: quote?.currency ?? 'EUR',
+      asOf: quote?.asOf ?? null,
+      alloc: 0,
+    };
+
+    if (priceError) {
+      return {
+        ...base,
+        price: null,
+        value: null,
+        gain: null,
+        gainPct: null,
+        priceError: true,
+      };
+    }
+
+    const value = shares * price;
+    const gain = value - cost;
+    const gainPct = cost ? (gain / cost) * 100 : 0;
+    return { ...base, price, value, gain, gainPct, priceError: false };
+  });
+}
+
+// Reduce normalized funds to derived portfolio metrics, and assign each fund its
+// derived `alloc` (value share, %). All value-based metrics are computed over
+// only the PRICED funds — funds flagged `priceError` (imported, no live NAV)
+// have no market value, so they are excluded from totals/allocation/donut math
+// while still appearing in the Holdings table. Best performer prefers YTD,
+// falling back to gain % when YTD is unavailable (e.g. imported funds).
+export function deriveMetrics(funds) {
+  const priced = funds.filter((f) => !f.priceError && f.value != null);
+
+  const TOTAL_VALUE = priced.reduce((s, f) => s + f.value, 0);
+  const TOTAL_COST = priced.reduce((s, f) => s + f.cost, 0);
+  const TOTAL_GAIN = TOTAL_VALUE - TOTAL_COST;
+  const TOTAL_GAIN_PCT = TOTAL_COST ? (TOTAL_GAIN / TOTAL_COST) * 100 : 0;
+
+  funds.forEach((f) => {
+    f.alloc =
+      !f.priceError && f.value != null && TOTAL_VALUE
+        ? (f.value / TOTAL_VALUE) * 100
+        : 0;
+  });
+
+  const equityValue = priced
+    .filter((f) => f.type === 'equity')
+    .reduce((s, f) => s + f.value, 0);
+  const EQUITY_PCT = TOTAL_VALUE
+    ? Math.round((equityValue / TOTAL_VALUE) * 100)
+    : 0;
+  const INCOME_PCT = TOTAL_VALUE ? 100 - EQUITY_PCT : 0;
+
+  const hasYtd = priced.some((f) => f.ytd != null);
+  const BEST_PERFORMER = priced.reduce((best, f) => {
+    if (!best) return f;
+    if (hasYtd) {
+      return (f.ytd ?? -Infinity) > (best.ytd ?? -Infinity) ? f : best;
+    }
+    return f.gainPct > best.gainPct ? f : best;
+  }, null);
+
+  const EST_ANNUAL_INCOME = priced.reduce(
+    (s, f) => s + (f.value * (f.yield ?? 0)) / 100,
+    0,
+  );
+
+  return {
+    TOTAL_VALUE,
+    TOTAL_COST,
+    TOTAL_GAIN,
+    TOTAL_GAIN_PCT,
+    EQUITY_PCT,
+    INCOME_PCT,
+    BEST_PERFORMER,
+    EST_ANNUAL_INCOME,
+  };
+}

@@ -1,15 +1,10 @@
 import { Doughnut } from 'react-chartjs-2';
-import {
-  funds,
-  fmtEur,
-  TOTAL_VALUE,
-  EQUITY_PCT,
-  INCOME_PCT,
-} from '../data/portfolio';
+import { fmtEur } from '../data/portfolio';
+import { usePortfolioData } from '../data/PortfolioDataContext';
 import { useTheme } from '../theme/ThemeContext';
 import './AllocationCard.scss';
 
-function makeData(theme) {
+function makeData(funds, theme) {
   return {
     labels: funds.map((f) => f.name),
     datasets: [
@@ -41,7 +36,7 @@ const arcLabels = {
       const value = chart.data.datasets[0].data[i];
       if (value < 5) return; // hide labels on slices under 5%
       const { x, y } = arc.getCenterPoint();
-      ctx.fillText(value + '%', x, y);
+      ctx.fillText(Math.round(value) + '%', x, y);
     });
     ctx.restore();
   },
@@ -67,6 +62,11 @@ const options = {
 
 export default function AllocationCard() {
   const { theme } = useTheme();
+  const { funds, totals } = usePortfolioData();
+  // Only priced funds have a market value, so only they belong in the donut and
+  // its legend. Unpriced (priceError) funds are surfaced in the Holdings table.
+  const pricedFunds = funds.filter((f) => !f.priceError && f.value != null);
+
   return (
     <section className="card">
       <div className="card-head">
@@ -78,19 +78,19 @@ export default function AllocationCard() {
       <div className="donut-layout">
         <div className="donut-wrap">
           <Doughnut
-            data={makeData(theme)}
+            data={makeData(pricedFunds, theme)}
             options={options}
             plugins={[arcLabels]}
           />
           <div className="donut-center">
-            <div className="dc-val">{fmtEur(TOTAL_VALUE)}</div>
+            <div className="dc-val">{fmtEur(totals.TOTAL_VALUE)}</div>
             <div className="dc-lab">Total Portfolio</div>
           </div>
         </div>
         <div className="legend-wrap">
           <div className="donut-legend">
-            {funds.map((f) => (
-              <div className="dl-item" key={f.name}>
+            {pricedFunds.map((f) => (
+              <div className="dl-item" key={f.id}>
                 <span className="dl-dot" style={{ background: f.color }}></span>
                 <div className="dl-text">
                   <div className="dl-name">{f.name}</div>
@@ -100,7 +100,7 @@ export default function AllocationCard() {
                   className={`dl-type ${f.type}`}
                   title={f.type === 'income' ? 'Income' : 'Equity'}
                 ></span>
-                <div className="dl-pct">{f.alloc}%</div>
+                <div className="dl-pct">{Math.round(f.alloc)}%</div>
               </div>
             ))}
           </div>
@@ -110,18 +110,18 @@ export default function AllocationCard() {
         <div className="split-head">
           <div className="label">Asset Mix</div>
           <div className="split-legend">
-            <span className="sl-item equity">Equity {EQUITY_PCT}%</span>
-            <span className="sl-item income">Income {INCOME_PCT}%</span>
+            <span className="sl-item equity">Equity {totals.EQUITY_PCT}%</span>
+            <span className="sl-item income">Income {totals.INCOME_PCT}%</span>
           </div>
         </div>
         <div className="split-bar">
           <div
             className="split-fill equity"
-            style={{ width: `${EQUITY_PCT}%` }}
+            style={{ width: `${totals.EQUITY_PCT}%` }}
           ></div>
           <div
             className="split-fill income"
-            style={{ width: `${INCOME_PCT}%` }}
+            style={{ width: `${totals.INCOME_PCT}%` }}
           ></div>
         </div>
       </div>
