@@ -80,11 +80,16 @@ export function PortfolioDataProvider({ children }) {
     }
     if (id !== reqId.current) return;
 
+    // Nothing priced at all == the proxy never answered usefully (wrong origin,
+    // network down, provider outage). Say that, rather than implying the file's
+    // ISINs were individually unresolvable.
     const missing = rows.filter((r) => !quotes.has(r.id));
-    const warning =
-      missing.length > 0
-        ? `${missing.length} of ${rows.length} fund(s) couldn't be priced — excluded from totals.`
-        : null;
+    let warning = null;
+    if (missing.length === rows.length) {
+      warning = `Couldn't reach the pricing service — none of the ${rows.length} fund(s) could be priced, so they're excluded from totals.`;
+    } else if (missing.length > 0) {
+      warning = `${missing.length} of ${rows.length} fund(s) couldn't be priced — excluded from totals.`;
+    }
 
     const funds = enrichFunds(rows, quotes, FUND_CATALOG);
     const totals = deriveMetrics(funds);
