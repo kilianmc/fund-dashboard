@@ -69,8 +69,13 @@ catalog)` and `deriveMetrics(funds)` so default and imported data run identical
   **server-side** and keyless (Yahoo search→chart), tolerant per-ISIN
   (`Promise.allSettled` → `{ quotes, errors }`), with CORS + `s-maxage` cache.
   This exists because these Irish EUR daily-NAV mutual funds have **no free
-  browser-CORS** price source. The frontend base URL is `VITE_NAV_API_URL`
-  (defaults to same origin); the proxy needs **no** API key.
+  browser-CORS** price source. The proxy needs **no** API key.
+- **Proxy origin ≠ page origin.** Federated into the shell, this code runs on
+  **kilianmc.com**, where a relative `/api/nav` hits the shell's SPA rewrite and
+  gets `200 text/html` — a _silent_ failure, not a 404. `navService.js` therefore
+  derives its base from **`import.meta.url`** (the origin this chunk was served
+  from) and validates the response `content-type`. `VITE_NAV_API_URL` is only an
+  override. Keep both guards: never make the request relative.
 - **Errors** — a malformed file → `status: 'error'` (previous data kept). An
   unpriceable fund → per-line "Unavailable", excluded from totals/donut — never a
   whole-app failure.

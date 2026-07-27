@@ -76,6 +76,39 @@ describe('fetchNav', () => {
     expect(map.size).toBe(0);
   });
 
+  // Regression: federated into the shell, a relative `/api/nav` hits the shell's
+  // SPA rewrite, which answers `200 text/html`. That must be treated as a failed
+  // lookup, not parsed.
+  it('returns an empty Map when the response is HTML rather than JSON', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const json = vi.fn(async () => ({
+      quotes: { IE0032620787: { price: 1 } },
+    }));
+    globalThis.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => 'text/html; charset=utf-8' },
+      json,
+    });
+
+    const map = await fetchNav(['IE0032620787']);
+    expect(map.size).toBe(0);
+    expect(json).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalled();
+  });
+
+  it('parses a response that declares a JSON content-type', async () => {
+    globalThis.fetch.mockResolvedValue({
+      ok: true,
+      status: 200,
+      headers: { get: () => 'application/json; charset=utf-8' },
+      json: async () => ({ quotes: { IE0032620787: { price: 77.88 } } }),
+    });
+
+    const map = await fetchNav(['IE0032620787']);
+    expect(map.get('IE0032620787')?.price).toBe(77.88);
+  });
+
   it('short-circuits without a fetch when given no ISINs', async () => {
     const map = await fetchNav([]);
     expect(map.size).toBe(0);
