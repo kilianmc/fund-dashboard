@@ -26,14 +26,21 @@ export default defineConfig({
         },
         // React must be a singleton shared with the host so it loads once.
         shared: {
-          react: { singleton: true, requiredVersion: '^18.2.0' },
-          'react-dom': { singleton: true, requiredVersion: '^18.2.0' },
+          react: {
+            singleton: true,
+            requiredVersion: '^18.2.0 || ^19.0.0',
+            strictVersion: false,
+          },
+          'react-dom': {
+            singleton: true,
+            requiredVersion: '^18.2.0 || ^19.0.0',
+            strictVersion: false,
+          },
         },
       }),
   ],
-  // Module Federation relies on top-level await; needs a modern build target.
-  build: {
-    target: 'chrome89',
+  resolve: {
+    dedupe: ['react', 'react-dom'],
   },
   css: {
     preprocessorOptions: {
