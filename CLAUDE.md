@@ -8,7 +8,7 @@ Module Federation contract below.
 
 A responsive fund portfolio dashboard.
 
-- **React 18** + **Vite 8** (`@vitejs/plugin-react`).
+- **React 19** + **Vite 8** (`@vitejs/plugin-react`).
 - **Pure JavaScript / JSX — NO TypeScript.** There is no `tsconfig.json`; do not
   add TS, `.ts`/`.tsx` files, or type-gen.
 - **SCSS** (`sass`, `modern-compiler` API) with design tokens exposed as CSS
@@ -94,10 +94,19 @@ entry files, you MUST preserve:
   global styles, and the `ThemeProvider` so the dashboard works both standalone
   and when mounted in the host.
 - **React & react-dom are shared singletons** (`singleton: true`,
-  `requiredVersion: '^18.2.0'`). Do not upgrade React across a major, and do not
-  remove the `shared` config.
-- **Build target `chrome89`** — required because Module Federation uses
-  top-level await. Do not lower it.
+  `requiredVersion: '^18.2.0 || ^19.0.0'`, explicit `strictVersion: false`). The
+  range is deliberately tolerant during the Track 0 React 19 rollout and narrows
+  to `^19.0.0` + `strictVersion: true` once both repos are on 19 in production —
+  because a mismatch is only a console warning, after which MF silently hoists
+  the highest React into code compiled against the other version. Do not remove
+  the `shared` config, and coordinate with the host.
+- **Do not reintroduce a `build.target` pin.** Vite 8's default baseline already
+  supports the top-level await Module Federation needs, so pinning `chrome89`
+  only lowers the baseline; the old "MF needs a modern target" justification was
+  false.
+- **Keep `resolve.dedupe: ['react', 'react-dom']`.** `@vitejs/plugin-react` 6 no
+  longer adds it, and duplicate React under federation is the failure it
+  prevents.
 - `remoteEntry.js` is the remote entry filename; `dts: false` (JS project).
 
 If a change would alter any of the above, call it out explicitly in the PR.
