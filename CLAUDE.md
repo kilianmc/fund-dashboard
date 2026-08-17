@@ -106,11 +106,18 @@ entry files, you MUST preserve:
   `Failed to bridge external shared module`, once per shared key (**four
   `console.error` lines**), and mounts anyway. Both cases are live here: **this
   project ships a standalone entry**, and standalone it boots first, so a range
-  its own installed React cannot satisfy blanks its own deployment — not just
-  `npm run dev`. Federated under the shell, the shell boots first, so the same
-  mistake only logs and the dashboard still mounts. Those four lines appear at
+  its own installed React cannot satisfy blanks its own **deployed build**.
+  Federated under the shell, the shell boots first, so the same mistake only logs
+  and the dashboard still mounts. In a production build those four lines appear at
   **initial page load** during eager remote init, not when the user opens the
-  dashboard. Rendering inside the shell proves nothing; the console is the gate.
+  dashboard. Under **`npm run dev`** — the mode this project is actually developed
+  in, since it runs standalone — they do not: since `@module-federation/vite`
+  1.20.7 the dev server materializes a share only once something imports it
+  (`materialize: false` on the rest, which the eager host-init loop skips), moving
+  the strict check from bootstrap to **first import** — so a violation throws
+  mid-render instead of blanking the page at load. Which shares start materialized
+  depends on what the module graph has already pulled in. Rendering inside the
+  shell proves nothing; the console is the gate.
   Under `strictVersion: false` even the fatal case was only a warning, after
   which MF silently hoisted the highest React into code compiled against the
   other version.
