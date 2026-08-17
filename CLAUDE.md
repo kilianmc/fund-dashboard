@@ -94,12 +94,17 @@ entry files, you MUST preserve:
   global styles, and the `ThemeProvider` so the dashboard works both standalone
   and when mounted in the host.
 - **React & react-dom are shared singletons** (`singleton: true`,
-  `requiredVersion: '^18.2.0 || ^19.0.0'`, explicit `strictVersion: false`). The
-  range is deliberately tolerant during the Track 0 React 19 rollout and narrows
-  to `^19.0.0` + `strictVersion: true` once both repos are on 19 in production —
-  because a mismatch is only a console warning, after which MF silently hoists
-  the highest React into code compiled against the other version. Do not remove
-  the `shared` config, and coordinate with the host.
+  `requiredVersion: '^19.0.0'`, `strictVersion: true`). Under
+  `strictVersion: false` a mismatch was only a console warning, after which MF
+  silently hoisted the highest React into code compiled against the other
+  version, so failures surfaced later looking unrelated; `strictVersion: true`
+  throws at share resolution instead. **Enforcement is asymmetric (verified by
+  experiment 2026-08-17):** the host's own share resolution throws and the page
+  dies, but this remote's throw is caught by `@module-federation/vite`, which
+  logs `Failed to bridge external shared module` and mounts anyway — so a
+  dashboard that renders inside the shell does not prove the contract holds; the
+  console is the signal. Do not remove the `shared` config, and coordinate with
+  the host.
 - **Do not reintroduce a `build.target` pin.** Vite 8's default baseline already
   supports the top-level await Module Federation needs, so pinning `chrome89`
   only lowers the baseline; the old "MF needs a modern target" justification was
