@@ -185,10 +185,12 @@ npm run test:run      # Vitest single run (used in CI)
   is skipped under Vitest (`process.env.VITEST`) — builds/dev keep it, so the
   contract is unchanged.
 
-**Node version — source of truth:** `package.json` `engines` (`>=22.12.0`) is
-the supported **floor**; `.nvmrc` (`24`, current LTS) is the **pinned** version
-used locally (`nvm use`) and in CI (`setup-node` reads `.nvmrc`). Any Node ≥
-22.12 works; use `nvm use` to match CI exactly.
+**Node version — source of truth:** `package.json` `engines`
+(`^22.22.2 || ^24.15.0 || >=26.0.0`) is the supported **range**; `.nvmrc` (`24`,
+current LTS) is the **pinned** version used locally (`nvm use`) and in CI
+(`setup-node` reads `.nvmrc`). The range mirrors `jsdom`, the strictest
+dependency floor in the tree — it is not a free choice. Use `nvm use` to match
+CI exactly.
 
 ## Git conventions
 
