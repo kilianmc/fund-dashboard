@@ -49,12 +49,13 @@ export default defineConfig({
       },
     },
   },
-  // Ensure any JSX not handled by the React Babel plugin (e.g. Vitest's esbuild
-  // fallback for .jsx test files) uses the automatic runtime, so React need not
-  // be in scope — matching the project's new-JSX-transform convention.
-  esbuild: {
-    jsx: 'automatic',
-  },
+  // No JSX transform config here on purpose. @vitejs/plugin-react already sets
+  // `oxc.jsx = { runtime: 'automatic', importSource, refresh }` in its own
+  // `config` hook, and it is active under Vitest too (only `federation` is
+  // skipped above), so the automatic runtime already covers test files. Adding
+  // an explicit `oxc.jsx` block here would duplicate it and risk clobbering the
+  // plugin's `refresh` (Fast Refresh) setting. The old `esbuild.jsx` block was
+  // dead: Vite 8 transforms with oxc, so Vite ignored it entirely.
   // Vitest configuration. jsdom gives components a DOM; globals lets tests use
   // describe/it/expect without importing them; setupFiles wires jest-dom.
   test: {
