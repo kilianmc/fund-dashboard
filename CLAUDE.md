@@ -94,12 +94,44 @@ entry files, you MUST preserve:
   global styles, and the `ThemeProvider` so the dashboard works both standalone
   and when mounted in the host.
 - **React & react-dom are shared singletons** (`singleton: true`,
-  `requiredVersion: '^18.2.0 || ^19.0.0'`, explicit `strictVersion: false`). The
-  range is deliberately tolerant during the Track 0 React 19 rollout and narrows
-  to `^19.0.0` + `strictVersion: true` once both repos are on 19 in production —
-  because a mismatch is only a console warning, after which MF silently hoists
-  the highest React into code compiled against the other version. Do not remove
-  the `shared` config, and coordinate with the host.
+  `requiredVersion: '^19.0.0'`, `strictVersion: true`). Do not remove the
+  `shared` config, and coordinate with the host — `strictVersion` is **inert
+  without `singleton: true`**, so a non-React share that omits the singleton flag
+  gets no version checking at all.
+- **Strict enforcement follows bootstrap order, not host vs. remote** (verified
+  by experiment 2026-08-17). The container that boots **first, with an empty
+  shared-module cache**, throws on a range it cannot satisfy, and that throw
+  rejects the entry wrapper so the real app entry is never imported — the page is
+  blank. Any container initialising **after** the cache is seeded only logs
+  `Failed to bridge external shared module`, once per shared key (**four
+  `console.error` lines**), and mounts anyway. Both cases are live here: **this
+  project ships a standalone entry**, and standalone it boots first, so a range
+  its own installed React cannot satisfy blanks its own **deployed build**.
+  Federated under the shell, the shell boots first, so the same mistake only logs
+  and the dashboard still mounts. In a production build those four lines appear at
+  **initial page load** during eager remote init, not when the user opens the
+  dashboard. Under **`npm run dev`** — the mode this project is actually developed
+  in, since it runs standalone — they do not: since `@module-federation/vite`
+  1.20.7 the dev server materializes a share only once something imports it
+  (`materialize: false` on the rest, which the eager host-init loop skips), moving
+  the strict check from bootstrap to **first import** — so a violation throws
+  mid-render instead of blanking the page at load. Which shares start materialized
+  depends on what the module graph has already pulled in. Rendering inside the
+  shell proves nothing; the console is the gate.
+  Under `strictVersion: false` even the fatal case was only a warning, after
+  which MF silently hoisted the highest React into code compiled against the
+  other version.
+- **A caught bridge failure is not harmless.** It lands on one React today only
+  because the first container to boot seeds the page-global share cache and later
+  ones rebind to it. Under a different load order, or for a package the shell
+  does not share, the fallback is this repo's own copy — a genuine second React.
+  This remote downloads and evaluates its own unused React chunk either way.
+- **Bumping React across a major (or onto a canary) needs the range widened
+  first.** Installing a React version this repo's own strict range does not admit
+  is exactly the fatal case above, so the order is: widen `requiredVersion` in
+  both repos → upgrade both → re-narrow to the new major with
+  `strictVersion: true`. This is what the tolerant `'^18.2.0 || ^19.0.0'` range
+  existed for.
 - **Do not reintroduce a `build.target` pin.** Vite 8's default baseline already
   supports the top-level await Module Federation needs, so pinning `chrome89`
   only lowers the baseline; the old "MF needs a modern target" justification was
@@ -153,10 +185,12 @@ npm run test:run      # Vitest single run (used in CI)
   is skipped under Vitest (`process.env.VITEST`) — builds/dev keep it, so the
   contract is unchanged.
 
-**Node version — source of truth:** `package.json` `engines` (`>=22.12.0`) is
-the supported **floor**; `.nvmrc` (`24`, current LTS) is the **pinned** version
-used locally (`nvm use`) and in CI (`setup-node` reads `.nvmrc`). Any Node ≥
-22.12 works; use `nvm use` to match CI exactly.
+**Node version — source of truth:** `package.json` `engines`
+(`^22.22.2 || ^24.15.0 || >=26.0.0`) is the supported **range**; `.nvmrc` (`24`,
+current LTS) is the **pinned** version used locally (`nvm use`) and in CI
+(`setup-node` reads `.nvmrc`). The range mirrors `jsdom`, the strictest
+dependency floor in the tree — it is not a free choice. Use `nvm use` to match
+CI exactly.
 
 ## Git conventions
 
